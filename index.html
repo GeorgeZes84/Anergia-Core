@@ -444,11 +444,6 @@ body[data-screen="employee"] .footer,body[data-screen="employeeLocked"] .footer{
 #applicationSent{width:min(100%,620px);margin:16px auto} .hr-email{padding:clamp(20px,5vw,36px);display:grid;gap:18px} .hr-email:after{display:none} .hr-email .turn-badge{justify-self:start;font-size:12px} .hr-email h2{font-size:clamp(30px,8vw,46px);line-height:1.05;letter-spacing:-.04em;margin:0} .hr-email p{font-size:clamp(17px,4.5vw,21px);line-height:1.45;margin:0} .hr-email .hr-signature{font-size:15px;white-space:pre-line;border-top:2px solid #111;padding-top:18px} .hr-actions{display:grid;grid-template-columns:1fr;gap:12px;margin-top:20px} #hrNextBtn{background:#111;color:#fff}
 #newCardsBtn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px}
 #newCardsBtn[hidden]{display:none!important}
-.redraw-dots{display:flex;gap:7px;justify-content:center}
-.redraw-dot{display:block;width:9px;height:9px;border:2px solid #111;border-radius:50%;background:#111}
-.redraw-dot.spent{background:transparent;border-color:#b6b6b0}
-#employee #deckActions.redraws-exhausted{grid-template-columns:1fr!important}
-#deckActions.redraws-exhausted #doneBtn{width:100%;grid-column:1/-1}
 #employer.active{display:flex;flex-direction:column;gap:10px;min-height:calc(100dvh - 100px)}
 #employer .screen-head{margin:0} .job-pool-note{font-size:14px;font-weight:700}
 #employer .job-list{display:grid;grid-template-columns:1fr;grid-template-rows:repeat(4,minmax(110px,1fr));max-height:none;overflow:visible;gap:10px;flex:1;padding:0 4px 4px 0}
@@ -487,17 +482,17 @@ const UI={"en":{"officeKicker":"APPLICATION OFFICE · UNEMPLOYMENT PROCESSING UN
 const COLORS={"Ambition & Success":"#b8922c","Clumsiness & Forgetfulness":"#d1544a","Habits & Quirks":"#d97f2f","Emotional & Empathetic":"#5f9f7d","Boldness & Spontaneity":"#8b73cd","Talent & Creativity":"#5f8fc9","Social & Relationships":"#c35b8e","Work & School":"#6e7886"};
 const JOB_COLORS={"Action & Adventure":"#d1544a","Creative & Arts":"#8b73cd","Food & Beverage":"#d97f2f","Travel & Leisure":"#5f8fc9","Animals & Nature":"#5f9f7d","Tech & Science":"#477f9d","Weird & Unusual":"#b8922c","Lifestyle & Glamour":"#c35b8e","Law & Specialized":"#66717c"};
 const QR_LABELS={en:{home:'Join with QR',title:'Join the game',close:'Close',copy:'Copy link',copied:'Link copied'},el:{home:'Μπες με QR',title:'Μπες στο παιχνίδι',close:'Κλείσιμο',copy:'Αντιγραφή link',copied:'Το link αντιγράφηκε'}};
-const state={jobPool:[],jobSeen:[],jobRedrawsRemaining:4,redrawsRemaining:4,role:'employee',cards:[],lockedCards:[],sound:true,job:null,lang:'en',category:'all'};
+const state={jobPool:[],jobSeen:[],role:'employee',cards:[],lockedCards:[],sound:true,job:null,lang:'en',category:'all'};
 const screens=[...document.querySelectorAll('.screen')];
 const $=id=>document.getElementById(id);
 let deferredInstallPrompt=null;
 const storageKey='anergia-core-state';
 function t(k){return UI[state.lang][k]||UI.en[k]||k;}
 function show(id){screens.forEach(s=>s.classList.toggle('active',s.id===id));document.body.dataset.screen=id;window.scrollTo({top:0,behavior:'smooth'});}
-function save(){localStorage.setItem(storageKey, JSON.stringify({jobPool:state.jobPool,jobSeen:state.jobSeen,jobRedrawsRemaining:state.jobRedrawsRemaining,redrawsRemaining:state.redrawsRemaining,role:state.role,cards:state.cards,lockedCards:state.lockedCards,job:state.job,lang:state.lang,category:state.category,sound:state.sound}));}
+function save(){localStorage.setItem(storageKey, JSON.stringify({jobPool:state.jobPool,jobSeen:state.jobSeen,role:state.role,cards:state.cards,lockedCards:state.lockedCards,job:state.job,lang:state.lang,category:state.category,sound:state.sound}));}
 function migrateCards(cards){return (Array.isArray(cards)?cards:[]).map(c=>{const q=QUALIFICATIONS.find(q=>q.id===c.id)||QUALIFICATIONS.find(q=>q.en.question===c.en?.question);return q?{...q,used:c.used===true}:null;}).filter(Boolean);}
-function load(){try{const s=JSON.parse(localStorage.getItem(storageKey));if(s){Object.assign(state,s);state.jobRedrawsRemaining=Number.isInteger(s.jobRedrawsRemaining)?Math.max(0,Math.min(4,s.jobRedrawsRemaining)):4;state.jobPool=Array.isArray(s.jobPool)?[...new Set(s.jobPool)].filter(i=>Number.isInteger(i)&&JOBS[i]):[];if(state.jobPool.length!==4)state.jobPool=[];state.jobSeen=Array.isArray(s.jobSeen)?[...new Set([...s.jobSeen,...state.jobPool])].filter(i=>Number.isInteger(i)&&JOBS[i]):[...state.jobPool];state.redrawsRemaining=Number.isInteger(s.redrawsRemaining)?Math.max(0,Math.min(4,s.redrawsRemaining)):4;state.cards=migrateCards(s.cards);state.lockedCards=migrateCards(s.lockedCards);}}catch{}}
-function resetGame(){state.jobPool=[];state.jobSeen=[];state.jobRedrawsRemaining=4;state.cards=[];state.lockedCards=[];state.redrawsRemaining=4;state.job=null;state.category='all';save();}
+function load(){try{const s=JSON.parse(localStorage.getItem(storageKey));if(s){Object.assign(state,s);delete state.jobRedrawsRemaining;state.jobPool=Array.isArray(s.jobPool)?[...new Set(s.jobPool)].filter(i=>Number.isInteger(i)&&JOBS[i]):[];if(state.jobPool.length!==4)state.jobPool=[];state.jobSeen=Array.isArray(s.jobSeen)?[...new Set([...s.jobSeen,...state.jobPool])].filter(i=>Number.isInteger(i)&&JOBS[i]):[...state.jobPool];delete state.redrawsRemaining;state.cards=migrateCards(s.cards);state.lockedCards=migrateCards(s.lockedCards);}}catch{}}
+function resetGame(){state.jobPool=[];state.jobSeen=[];state.cards=[];state.lockedCards=[];state.job=null;state.category='all';save();}
 function beep(freq=420,dur=.045){if(!state.sound)return;try{const a=new (window.AudioContext||window.webkitAudioContext)(),o=a.createOscillator(),g=a.createGain();o.frequency.value=freq;g.gain.value=.025;o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+dur);}catch{}}
 function toast(txt){const el=$('toast');el.textContent=txt;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),1400);}
 function localQual(q){return q[state.lang]||q.en;}
@@ -553,33 +548,29 @@ function drawJobs(){
   for(let i=available.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[available[i],available[j]]=[available[j],available[i]];}
   state.jobPool=available.slice(0,4);state.jobSeen.push(...state.jobPool);save();renderJobs();
 }
-function redrawJobs(){if(state.job||state.jobRedrawsRemaining<=0)return;state.jobRedrawsRemaining--;drawJobs();beep(480);}
+function redrawJobs(){if(state.job)return;drawJobs();beep(480);}
 function renderJobs(){
   $('jobPoolNote').textContent=state.lang==='el'?'Διάλεξε μία από τις τέσσερις δουλειές.':'Choose one of these four jobs.';
   $('jobList').innerHTML=state.jobPool.map(i=>`<button class="job" data-job="${i}"><strong>${localJob(JOBS[i]).name}</strong></button>`).join('');
-  const b=$('redrawJobsBtn'),n=state.jobRedrawsRemaining,label=state.lang==='el'?'Νέες δουλειές':'New jobs';
-  b.innerHTML=`<span>${label}</span><span class="redraw-dots" aria-hidden="true">${Array.from({length:4},(_,i)=>`<span class="redraw-dot ${i<n?'available':'spent'}"></span>`).join('')}</span>`;
-  b.setAttribute('aria-label',label+' — '+n+' '+(state.lang==='el'?'αλλαγές απομένουν':'redraws remaining'));b.disabled=n===0||!!state.job;b.hidden=n===0||!!state.job;
+  const b=$('redrawJobsBtn'),label=state.lang==='el'?'Νέες δουλειές':'New jobs';
+  b.textContent=label;b.setAttribute('aria-label',label);b.disabled=!!state.job;b.hidden=!!state.job;
 }
 function applyLanguage(){renderCompletion();document.documentElement.lang=state.lang;document.title='Ανεργία Core';$('tagline').textContent=t('tagline');$('chooseRole').textContent=t('chooseRole');$('employeeRole').textContent=t('employee');$('employerRole').textContent=t('employer');$('employeeDesc').textContent=t('employeeDesc');$('employerDesc').textContent=t('employerDesc');$('newGameBtn').innerHTML=t('newCase');$('continueBtn').innerHTML=t('continueCase');$('buildResume').textContent=t('buildResume');$('applicationOpen').textContent=t('applicationOpen');renderRedraws();$('doneBtn').textContent=t('done');$('resumeLocked').textContent=t('resumeLocked');$('approved').textContent=t('approved');$('menuBtn1').textContent=$('menuBtn2').textContent=t('menu');$('nextPlayerBtn').textContent=t('nextPlayer');$('pickJob').textContent=t('pickJob');$('jobLocked').textContent=t('jobLocked');$('sealed').textContent=t('sealed');$('employerSelection').textContent=t('employerSelection');$('jobLockedNote').textContent=t('jobLockedNote');$('nextEmployeeBtn').textContent=t('passEmployee');$('footer').textContent=t('footer');$('langEn').textContent=t('english');$('langEl').textContent=t('greek');$('installBtn').textContent=t('install');$('installHint').textContent=t('installHelp');const ql=QR_LABELS[state.lang]||QR_LABELS.en;$('qrHomeLabel').textContent=ql.home;$('qrTitle').textContent=ql.title;$('qrCloseBtn').textContent=ql.close;$('qrCopyBtn').textContent=ql.copy;document.querySelectorAll('.lang').forEach(b=>b.classList.toggle('active',b.dataset.lang===state.lang));renderJobBanner('jobBanner');renderJobBanner('lockedJobBanner');if(state.cards.length)renderCards('cards',state.cards,false);if(state.lockedCards.length)renderCards('lockedCards',state.lockedCards,true);if(state.job)$('lockedJobName').textContent=localJob(state.job).name;renderJobs();}
 function maybeShowInstall(){$('installBtn').classList.toggle('hidden', !deferredInstallPrompt);$('installHint').style.display = deferredInstallPrompt ? 'block' : 'none';}
 function renderRedraws(){
-  const remaining=state.redrawsRemaining,button=$('newCardsBtn');
-  button.innerHTML=`<span>${t('newCards')}</span><span class="redraw-dots" aria-hidden="true">${Array.from({length:4},(_,i)=>`<span class="redraw-dot ${i<remaining?'available':'spent'}"></span>`).join('')}</span>`;
-  button.setAttribute('aria-label',t('newCards')+' — '+(state.lang==='el'?remaining+' αλλαγές απομένουν':remaining+' redraws remaining'));
-  button.disabled=remaining===0;button.hidden=remaining===0;
-  $('deckActions').classList.toggle('redraws-exhausted',remaining===0);
+  const button=$('newCardsBtn');button.textContent=t('newCards');button.setAttribute('aria-label',t('newCards'));
+  button.disabled=false;button.hidden=false;
 }
-function redrawHand(){if(state.redrawsRemaining<=0)return;state.redrawsRemaining--;beep(480);pickCards();}
+function redrawHand(){if(state.lockedCards.length)return;beep(480);pickCards();}
 function pickCards(){const arr=[...QUALIFICATIONS];for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}state.cards=arr.slice(0,4).map(c=>({...c,used:false}));state.lockedCards=[];save();renderCards('cards',state.cards,false);renderRedraws();}
 document.querySelectorAll('.role').forEach(b=>b.onclick=()=>{state.role=b.dataset.role;document.querySelectorAll('.role').forEach(x=>x.classList.toggle('selected',x===b));save();beep();});
 $('newGameBtn').onclick=()=>{resetGame();beep(520);enterTurn();};
 $('continueBtn').onclick=()=>{load();applyLanguage();document.querySelectorAll('.role').forEach(x=>x.classList.toggle('selected',x.dataset.role===state.role));beep();enterTurn();};
-function enterTurn(){if(state.role==='employer'){if(state.job){$('lockedJobName').textContent=localJob(state.job).name;show('employerLocked');}else{if(!state.jobPool.length)drawJobs();renderJobs();show('employer');}}else{if(!state.cards.length)pickCards();renderCards('cards',state.cards,false);renderJobBanner('jobBanner');show('employee');}};
+function enterTurn(){if(state.role==='employer'){if(state.job){$('lockedJobName').textContent=localJob(state.job).name;show('employerLocked');}else{if(!state.jobPool.length)drawJobs();renderJobs();show('employer');}}else{if(state.lockedCards.length){renderCards('lockedCards',state.lockedCards,true);renderJobBanner('lockedJobBanner');show('employeeLocked');return;}if(!state.cards.length)pickCards();renderCards('cards',state.cards,false);renderJobBanner('jobBanner');show('employee');}};
 $('newCardsBtn').onclick=redrawHand;
 $('doneBtn').onclick=()=>{state.lockedCards=[...state.cards];save();renderCards('lockedCards',state.lockedCards,true);renderJobBanner('lockedJobBanner');beep(720,.08);show('employeeLocked');};
-$('nextPlayerBtn').onclick=()=>{state.cards=[];state.lockedCards=[];state.redrawsRemaining=4;state.role='employee';save();enterTurn();};
-$('nextEmployeeBtn').onclick=()=>{state.role='employee';state.cards=[];state.lockedCards=[];state.redrawsRemaining=4;save();enterTurn();};
+$('nextPlayerBtn').onclick=()=>{state.cards=[];state.lockedCards=[];state.role='employee';save();enterTurn();};
+$('nextEmployeeBtn').onclick=()=>{state.role='employee';state.cards=[];state.lockedCards=[];save();enterTurn();};
 $('menuBtn1').onclick=$('menuBtn2').onclick=()=>show('menu');
 $('redrawJobsBtn').onclick=redrawJobs;
 $('jobList').onclick=e=>{const btn=e.target.closest('.job');if(!btn)return;if(state.job){toast(t('alreadyLocked'));return;}const index=Number(btn.dataset.job);if(!state.jobPool.includes(index))return;state.job=JOBS[index];save();$('lockedJobName').textContent=localJob(state.job).name;beep(760,.09);show('employerLocked');};
