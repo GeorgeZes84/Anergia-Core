@@ -1,0 +1,30 @@
+{
+  "name": "Ανεργία Core",
+  "short_name": "Ανεργία Core",
+  "description": "A colorful bilingual neo-brutalist party game about building gloriously questionable résumés.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
+  "background_color": "#f4f0e8",
+  "theme_color": "#f4f0e8",
+  "orientation": "portrait-primary",
+  "lang": "el",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -1,0 +1,514 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<meta name="theme-color" content="#f4f0e8" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Ανεργία Core" />
+<meta name="mobile-web-app-capable" content="yes" />
+<link rel="manifest" href="/manifest.webmanifest" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+<title>Ανεργία Core</title>
+<style>
+:root{--bg:#fff7ef;--ink:#0d0d0d;--paper:#fffdf8;--yellow:#ffd400;--pink:#ff5fb2;--blue:#4eb3ff;--green:#87f56f;--orange:#ff8a3d;--purple:#9e7bff;--red:#ff5a5a;--border:4px solid #0d0d0d;--shadow:6px 6px 0 #0d0d0d;--radius:24px;--safe-bottom:max(16px, env(safe-area-inset-bottom));--safe-top:max(16px, env(safe-area-inset-top));}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;background:var(--yellow);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+body{min-height:100dvh;background:radial-gradient(circle at 0 0, rgba(255,255,255,.5), transparent 20%),radial-gradient(circle at 100% 20%, rgba(255,255,255,.4), transparent 18%),linear-gradient(135deg, #ffd400 0%, #ffd400 42%, #ffef86 42%, #ffef86 58%, #ffd400 58%, #ffd400 100%);}
+button,input{font:inherit} button{cursor:pointer} input{appearance:none}
+.app{min-height:100dvh;display:flex;flex-direction:column;width:100%;max-width:100%;padding:var(--safe-top) clamp(12px,3vw,26px) var(--safe-bottom);}
+.inner{width:min(100%, 980px);margin:0 auto;display:flex;flex-direction:column;flex:1;}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px;}
+.lang-wrap,.top-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.lang,.sound-btn,.install-btn{border:var(--border);background:#fff;border-radius:999px;box-shadow:4px 4px 0 #0d0d0d;font-weight:900;text-transform:uppercase;letter-spacing:.04em}
+.lang{padding:10px 14px;font-size:12px}
+.lang.active{background:var(--ink);color:#fff}
+.sound-btn,.install-btn{padding:10px 14px;font-size:12px;min-height:44px}
+.install-btn.hidden{display:none}
+main{flex:1;display:flex;flex-direction:column}
+.screen{display:none;animation:pop .18s ease-out} .screen.active{display:block}
+@keyframes pop{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}
+.panel{border:var(--border);border-radius:32px;background:var(--paper);box-shadow:var(--shadow);padding:18px;position:relative;overflow:hidden}
+.panel:after{content:"";position:absolute;right:-20px;top:-20px;width:80px;height:80px;background:var(--blue);border:var(--border);border-radius:50%;transform:rotate(12deg)}
+.hero{display:grid;gap:14px}
+.hero-title{font-size:clamp(52px,14vw,118px);line-height:.86;letter-spacing:-.07em;text-transform:uppercase;font-weight:1000;margin:0;position:relative;z-index:1}
+.kicker{display:inline-block;align-self:start;border:var(--border);background:var(--green);padding:8px 12px;border-radius:999px;box-shadow:4px 4px 0 #0d0d0d;font-size:12px;font-weight:900;text-transform:uppercase;position:relative;z-index:1}
+.tagline{font-size:clamp(16px,3.8vw,22px);font-weight:800;line-height:1.1;max-width:26ch;margin:0;position:relative;z-index:1}
+.sticker-row{display:flex;flex-wrap:wrap;gap:10px;position:relative;z-index:1}
+.sticker{display:inline-flex;align-items:center;gap:8px;border:var(--border);border-radius:16px;padding:10px 12px;background:var(--pink);box-shadow:4px 4px 0 #0d0d0d;font-weight:900;text-transform:uppercase;font-size:12px}
+.sticker.alt{background:var(--blue)} .sticker.alt2{background:#fff}
+.section-label{margin:16px 0 10px;font-size:14px;font-weight:1000;text-transform:uppercase;letter-spacing:.03em}
+.role-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.role{min-height:170px;border:var(--border);border-radius:28px;padding:18px;box-shadow:var(--shadow);text-align:left;position:relative;overflow:hidden;background:#fff;display:flex;flex-direction:column;justify-content:space-between}
+.role:nth-child(1){background:var(--pink)} .role:nth-child(2){background:var(--blue)} .role.selected{outline:6px solid #fff;transform:translate(-2px,-2px)}
+.role strong{display:block;font-size:clamp(28px,6vw,40px);line-height:.9;letter-spacing:-.05em;text-transform:uppercase} .role .desc{font-size:15px;font-weight:800;line-height:1.08;max-width:15ch} .role .emoji{position:absolute;right:14px;bottom:8px;font-size:40px}
+.menu-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:16px}
+.big-btn{min-height:86px;border:var(--border);border-radius:28px;box-shadow:var(--shadow);font-size:clamp(22px,5vw,30px);font-weight:1000;text-transform:uppercase;letter-spacing:-.04em;line-height:.95;padding:12px 14px;background:#fff}
+.big-btn.primary{background:var(--ink);color:#fff} .big-btn.secondary{background:var(--orange)}
+.pass-card{min-height:72dvh;display:grid;place-items:center;text-align:center} .pass-inner{display:grid;gap:18px;justify-items:center}
+.turn-badge{border:var(--border);border-radius:999px;background:var(--green);padding:10px 16px;box-shadow:4px 4px 0 #0d0d0d;font-weight:1000;text-transform:uppercase}
+.turn-title{font-size:clamp(40px,10vw,82px);line-height:.9;letter-spacing:-.06em;text-transform:uppercase;font-weight:1000;margin:0;max-width:9ch} .turn-sub{font-size:18px;font-weight:800;max-width:20ch;margin:0} .enter-btn{width:min(100%,320px);min-height:88px;border:var(--border);border-radius:28px;box-shadow:var(--shadow);background:var(--pink);font-size:clamp(22px,5vw,30px);font-weight:1000;text-transform:uppercase;line-height:.95}
+.screen-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px} .screen-title{font-size:clamp(32px,8vw,56px);line-height:.9;letter-spacing:-.05em;text-transform:uppercase;font-weight:1000;margin:0} .screen-note{display:inline-flex;align-items:center;gap:8px;border:var(--border);border-radius:16px;background:var(--green);padding:8px 12px;box-shadow:4px 4px 0 #0d0d0d;font-size:12px;font-weight:1000;text-transform:uppercase;white-space:nowrap}
+.job-banner{border:var(--border);border-radius:24px;padding:14px 16px;background:#fff;box-shadow:var(--shadow);display:flex;gap:12px;align-items:center;margin-bottom:14px;font-weight:900;font-size:18px;line-height:1.05} .job-banner .icon{font-size:26px} .job-banner small{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:stretch} .card{position:relative;border:var(--border);border-radius:26px;box-shadow:var(--shadow);background:#fff;padding:16px;min-height:180px;overflow:hidden;display:flex;flex-direction:column} .card:before{content:"";position:absolute;inset:auto 14px 14px auto;width:54px;height:54px;border:var(--border);border-radius:50%;background:var(--accent,var(--orange));opacity:.18} .card .cat{font-size:12px;font-weight:1000;text-transform:uppercase;line-height:1;margin-bottom:10px;color:#333} .card .trait{font-size:clamp(24px,5vw,36px);font-weight:1000;line-height:.9;letter-spacing:-.05em;text-transform:uppercase;margin-bottom:12px} .card .q{font-size:18px;font-weight:800;line-height:1.08;max-width:22ch} .lock-badge{position:absolute;right:12px;top:12px;border:var(--border);border-radius:999px;background:var(--yellow);padding:6px 10px;font-size:11px;font-weight:1000;text-transform:uppercase}
+.actions{position:sticky;bottom:0;padding-top:18px;margin-top:4px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;background:linear-gradient(transparent, rgba(255,212,0,0.75) 30%, rgba(255,212,0,1) 70%)} .action{min-height:72px;border:var(--border);border-radius:999px;box-shadow:var(--shadow);background:#fff;font-size:18px;font-weight:1000;text-transform:uppercase;letter-spacing:-.03em} .action.primary{background:var(--ink);color:#fff}
+.jobs-shell{border:var(--border);border-radius:30px;background:#fff;box-shadow:var(--shadow);padding:16px} .search{width:100%;min-height:58px;border:var(--border);border-radius:999px;box-shadow:4px 4px 0 #0d0d0d;background:#fff;padding:12px 18px;font-size:18px;font-weight:800;margin-bottom:12px} .search::placeholder{color:#666} .filter-row{display:flex;gap:10px;overflow:auto;padding:2px 2px 12px;scrollbar-width:none} .filter-row::-webkit-scrollbar{display:none} .filter-chip{flex:0 0 auto;border:var(--border);border-radius:999px;box-shadow:4px 4px 0 #0d0d0d;background:#fff;padding:10px 14px;font-size:12px;font-weight:1000;text-transform:uppercase} .filter-chip.active{background:var(--ink);color:#fff}
+.jobs-topline{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap} .vacancy-count{font-size:13px;font-weight:1000;text-transform:uppercase} .job-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;max-height:56dvh;overflow:auto;padding:2px 2px 8px} .job{--jaccent:var(--orange);border:var(--border);border-radius:24px;box-shadow:var(--shadow);background:#fff;padding:14px;text-align:left;position:relative;overflow:hidden;min-height:138px;display:flex;flex-direction:column;justify-content:space-between} .job:before{content:"";position:absolute;right:-8px;top:-8px;width:58px;height:58px;border:var(--border);border-radius:50%;background:var(--jaccent);opacity:.28} .job-code{display:inline-block;align-self:flex-start;border:3px solid #0d0d0d;border-radius:999px;background:var(--jaccent);padding:5px 8px;font-size:10px;font-weight:1000;text-transform:uppercase;margin-bottom:8px} .job .jcat{font-size:12px;font-weight:1000;text-transform:uppercase;line-height:1.05;margin-bottom:8px} .job strong{font-size:22px;font-weight:1000;line-height:.95;letter-spacing:-.03em;display:block;max-width:12ch}
+.locked-panel{border:var(--border);border-radius:32px;background:var(--blue);box-shadow:var(--shadow);padding:24px;display:grid;gap:14px;text-align:center} .locked-panel .big{font-size:clamp(34px,8vw,64px);font-weight:1000;line-height:.9;letter-spacing:-.05em;text-transform:uppercase} .note{font-size:16px;font-weight:800;line-height:1.1;max-width:34ch;margin:0 auto}
+.footer{margin-top:16px;font-size:12px;font-weight:900;text-transform:uppercase;text-align:center;padding-bottom:8px} .install-hint{margin-top:10px;border:var(--border);border-radius:20px;box-shadow:var(--shadow);background:#fff;padding:12px 14px;font-size:14px;font-weight:800;display:none} .toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%) translateY(30px);background:#0d0d0d;color:#fff;border:var(--border);border-radius:999px;padding:12px 16px;font-size:14px;font-weight:900;opacity:0;pointer-events:none;transition:.2s;z-index:99;max-width:min(92vw,480px);text-align:center} .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.qr-home-btn{grid-column:1/-1;min-height:74px;border:var(--border);border-radius:24px;box-shadow:var(--shadow);background:var(--green);font-size:clamp(18px,4.5vw,25px);font-weight:1000;text-transform:uppercase;letter-spacing:-.03em;padding:12px 16px;display:flex;align-items:center;justify-content:center;gap:10px}
+.qr-home-btn .qr-icon{font-size:28px;line-height:1}
+.qr-modal{position:fixed;inset:0;z-index:100;display:none;place-items:center;padding:max(18px,env(safe-area-inset-top)) 16px max(18px,env(safe-area-inset-bottom));background:rgba(13,13,13,.82);backdrop-filter:blur(3px)}
+.qr-modal.open{display:grid}
+.qr-sheet{width:min(100%,520px);border:var(--border);border-radius:32px;background:var(--yellow);box-shadow:10px 10px 0 #000;padding:18px;display:grid;gap:14px;text-align:center}
+.qr-sheet h2{font-size:clamp(34px,9vw,58px);line-height:.88;letter-spacing:-.055em;text-transform:uppercase;margin:0;font-weight:1000}
+.qr-frame{border:var(--border);border-radius:26px;background:#fff;box-shadow:var(--shadow);padding:14px;display:grid;place-items:center;aspect-ratio:1/1;width:min(100%,360px);margin:0 auto}
+.qr-frame img{width:100%;height:100%;object-fit:contain;image-rendering:auto}
+.qr-url{border:var(--border);border-radius:18px;background:#fff;padding:10px 12px;font-size:13px;font-weight:900;overflow-wrap:anywhere;box-shadow:4px 4px 0 #000}
+.qr-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.qr-actions button{min-height:58px;border:var(--border);border-radius:999px;box-shadow:4px 4px 0 #000;background:#fff;font-weight:1000;text-transform:uppercase;font-size:14px}
+.qr-actions .primary{background:var(--ink);color:#fff}
+
+@media (max-width:740px){.app{padding-inline:12px} .topbar{align-items:flex-start;flex-direction:column} .top-actions{width:100%;justify-content:space-between} .role-grid,.cards,.job-list,.menu-actions,.actions{grid-template-columns:1fr} .role{min-height:140px} .job{min-height:126px} .job strong{font-size:20px} .panel,.jobs-shell,.locked-panel{padding:14px} .screen-head{flex-direction:column;align-items:flex-start} .screen-note{font-size:11px} .search{font-size:16px;min-height:54px} .card{min-height:156px} .card .q{font-size:16px} .action{min-height:64px} }
+@media (min-width:741px){.hero-layout{display:grid;grid-template-columns:1.15fr .85fr;gap:18px;align-items:start} .menu-side{display:grid;gap:14px} .job-list{grid-template-columns:repeat(3,minmax(0,1fr))} }
+
+/* CALMER NEO-BRUTALIST MOBILE PASS */
+:root{
+  --bg:#f4f0e8;
+  --paper:#fffdfa;
+  --ink:#111111;
+  --yellow:#f1d44c;
+  --pink:#ef8fbd;
+  --blue:#9ecae8;
+  --green:#afd8a6;
+  --orange:#efaa6c;
+  --purple:#b9a9df;
+  --red:#e88b83;
+  --border:3px solid #111;
+  --shadow:4px 4px 0 #111;
+}
+html,body{background:var(--bg)!important;color:#111!important;overflow-x:hidden}
+body{background:var(--bg)!important}
+body *{color:#111}
+.lang.active,.big-btn.primary,.action.primary,.filter-chip.active{color:#fff!important;background:#111!important}
+.panel,.jobs-shell,.locked-panel,.role,.job,.card,.job-banner,.search,.qr-sheet,.qr-frame,.qr-url{background:var(--paper)}
+.panel:after{background:var(--orange);opacity:.55}
+.kicker{background:var(--green)}
+.sticker{background:var(--pink)}
+.sticker.alt{background:var(--orange)}
+.sticker.alt2{background:#fff}
+.role:nth-child(1){background:#f7d8e7}
+.role:nth-child(2){background:#dbeaf3}
+.big-btn.secondary{background:#f4c99f}
+.enter-btn{background:#f2c5da}
+.turn-badge,.screen-note{background:#d6e7cc}
+.locked-panel{background:#e2edf4}
+.qr-sheet{background:#f4f0e8}
+.qr-home-btn{background:#d6e7cc;color:#111}
+.job-code{color:#111!important}
+
+/* shrink the chrome and give the content the screen */
+.app{padding:max(8px,env(safe-area-inset-top)) clamp(9px,2.5vw,18px) max(8px,env(safe-area-inset-bottom))}
+.inner{width:min(100%,920px)}
+.topbar{margin-bottom:8px;gap:7px}
+.lang-wrap,.top-actions{gap:7px}
+.lang,.sound-btn,.install-btn{min-height:36px;padding:7px 10px;font-size:10px;box-shadow:3px 3px 0 #111}
+.panel{padding:14px;border-radius:24px}
+.hero{gap:10px}
+.hero-title{font-size:clamp(42px,11vw,82px);line-height:.88}
+.kicker{padding:6px 9px;font-size:10px;box-shadow:3px 3px 0 #111}
+.tagline{font-size:clamp(13px,3vw,17px);max-width:31ch}
+.sticker-row{gap:7px}.sticker{padding:7px 9px;font-size:10px;box-shadow:3px 3px 0 #111}
+.section-label{margin:11px 0 7px;font-size:12px}
+.role-grid{gap:9px}.role{min-height:118px;padding:13px;border-radius:20px}
+.role strong{font-size:clamp(21px,5vw,30px)}.role .desc{font-size:12px;max-width:17ch}.role .emoji{font-size:30px}
+.menu-actions{gap:9px;margin-top:10px}.big-btn{min-height:66px;border-radius:20px;font-size:clamp(17px,4.4vw,23px);box-shadow:4px 4px 0 #111}
+.qr-home-btn{min-height:58px;border-radius:20px;font-size:clamp(15px,4vw,20px);box-shadow:4px 4px 0 #111}.qr-home-btn .qr-icon{font-size:22px}
+.footer{margin-top:9px;padding-bottom:2px;font-size:9px}
+
+/* game screens: all four cards stay visible on a phone */
+body[data-screen="employee"],body[data-screen="employeeLocked"]{overflow:hidden}
+body[data-screen="employee"] .footer,body[data-screen="employeeLocked"] .footer{display:none}
+#employee.active,#employeeLocked.active{height:calc(100dvh - max(8px,env(safe-area-inset-top)) - max(8px,env(safe-area-inset-bottom)) - 44px);display:flex;flex-direction:column;min-height:0}
+#employee .screen-head,#employeeLocked .screen-head{margin-bottom:7px;flex:0 0 auto}
+.screen-title{font-size:clamp(25px,6.6vw,38px);line-height:.9}
+.screen-note{padding:5px 8px;font-size:9px;box-shadow:3px 3px 0 #111;border-radius:12px}
+.job-banner{padding:8px 10px;border-radius:16px;margin-bottom:8px;font-size:14px;box-shadow:3px 3px 0 #111;flex:0 0 auto}
+.job-banner .icon{font-size:20px}.job-banner small{font-size:8px;margin-bottom:2px}
+#employee .cards,#employeeLocked .cards{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:8px;flex:1;min-height:0;margin:0 0 8px}
+#employee .card,#employeeLocked .card{min-height:0;height:100%;padding:10px 10px 9px;border-radius:18px;box-shadow:3px 3px 0 #111}
+#employee .card .cat,#employeeLocked .card .cat{font-size:8px;margin-bottom:5px;line-height:1.05;color:#111!important}
+#employee .card .trait,#employeeLocked .card .trait{font-size:clamp(15px,4.2vw,22px);line-height:.92;margin-bottom:7px;color:#111!important}
+#employee .card .q,#employeeLocked .card .q{font-size:clamp(10px,2.9vw,13px);line-height:1.08;font-weight:750;color:#111!important;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:4;overflow:hidden}
+#employee .card:before,#employeeLocked .card:before{width:34px;height:34px;inset:auto 8px 8px auto;border-width:2px;opacity:.18}
+.lock-badge{right:7px;top:7px;padding:3px 6px;font-size:7px;border-width:2px;background:#f2df75;color:#111!important}
+#employee .actions,#employeeLocked .actions{position:static;flex:0 0 auto;margin:0;padding:0;background:none;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.action{min-height:48px;font-size:14px;box-shadow:3px 3px 0 #111}
+
+/* employer stays scrollable but less oversized */
+.jobs-shell{padding:11px;border-radius:22px}
+.search{min-height:46px;padding:9px 13px;font-size:14px;margin-bottom:8px;box-shadow:3px 3px 0 #111}
+.filter-row{gap:7px;padding-bottom:8px}.filter-chip{padding:7px 10px;font-size:9px;box-shadow:3px 3px 0 #111}
+.job-list{gap:8px;max-height:62dvh}.job{min-height:102px;padding:10px;border-radius:18px;box-shadow:3px 3px 0 #111}.job strong{font-size:17px;line-height:.98;color:#111!important}.job .jcat{font-size:9px;color:#111!important}.job-code{font-size:8px;padding:4px 6px;border-width:2px}
+.locked-panel{padding:16px;border-radius:24px}.locked-panel .big{font-size:clamp(28px,7vw,46px)}.note{font-size:13px}
+
+@media (max-width:740px){
+  .topbar{flex-direction:row;align-items:center}
+  .top-actions{width:auto;justify-content:flex-end}
+  .role-grid,.menu-actions{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .job-list{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .actions{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .role{min-height:108px}
+  .panel,.jobs-shell,.locked-panel{padding:11px}
+  .screen-head{flex-direction:row;align-items:flex-start}
+  .card{min-height:0}
+}
+@media (max-width:380px){
+  .lang,.sound-btn,.install-btn{font-size:9px;padding:6px 8px;min-height:32px}
+  .screen-title{font-size:24px}.screen-note{font-size:8px}
+  .job-banner{font-size:12px;padding:7px 9px}
+  #employee .cards,#employeeLocked .cards{gap:6px;margin-bottom:6px}
+  #employee .card,#employeeLocked .card{padding:8px;border-radius:15px}
+  #employee .card .trait,#employeeLocked .card .trait{font-size:14px;margin-bottom:5px}
+  #employee .card .q,#employeeLocked .card .q{font-size:9.5px;-webkit-line-clamp:4}
+  .action{min-height:44px;font-size:12px}
+  .job-list{grid-template-columns:1fr 1fr}
+  .job strong{font-size:15px}
+}
+@media (max-height:700px) and (max-width:740px){
+  .topbar{margin-bottom:5px}.lang,.sound-btn,.install-btn{min-height:30px;padding:5px 8px}
+  #employee.active,#employeeLocked.active{height:calc(100dvh - max(6px,env(safe-area-inset-top)) - max(6px,env(safe-area-inset-bottom)) - 36px)}
+  .screen-title{font-size:22px}.screen-note{padding:4px 6px;font-size:8px}.job-banner{padding:6px 8px;margin-bottom:6px;font-size:11px}.job-banner .icon{font-size:16px}
+  #employee .cards,#employeeLocked .cards{gap:5px;margin-bottom:5px}
+  #employee .card,#employeeLocked .card{padding:7px;border-radius:14px}
+  #employee .card .trait,#employeeLocked .card .trait{font-size:13px;margin-bottom:4px}
+  #employee .card .q,#employeeLocked .card .q{font-size:9px;line-height:1.04;-webkit-line-clamp:3}
+  .action{min-height:40px;font-size:11px}
+}
+
+
+/* === CLARITY PASS: BIG MEANINGFUL TEXT, ZERO DEAD AIR === */
+#employee .screen-note,
+#employeeLocked .screen-note{display:none}
+
+#employee .screen-head,
+#employeeLocked .screen-head{margin-bottom:6px}
+
+#employee .screen-title,
+#employeeLocked .screen-title{
+  font-size:clamp(28px,7.4vw,40px);
+  line-height:.88;
+  letter-spacing:-.045em
+}
+
+#employee .job-banner,
+#employeeLocked .job-banner{
+  min-height:50px;
+  padding:8px 12px;
+  margin-bottom:7px;
+  font-size:clamp(15px,4vw,18px);
+  line-height:1;
+  font-weight:1000
+}
+#employee .job-banner small,
+#employeeLocked .job-banner small{display:none}
+#employee .job-banner .icon,
+#employeeLocked .job-banner .icon{font-size:22px}
+
+#employee .cards,
+#employeeLocked .cards{
+  gap:7px;
+  margin-bottom:7px
+}
+
+#employee .card,
+#employeeLocked .card{
+  padding:34px 12px 12px;
+  justify-content:center;
+  align-items:flex-start
+}
+
+#employee .card .cat,
+#employeeLocked .card .cat{
+  position:absolute;
+  top:9px;
+  left:10px;
+  right:10px;
+  margin:0;
+  font-size:9px;
+  line-height:1;
+  font-weight:1000;
+  letter-spacing:.035em;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis
+}
+
+#employee .card .trait,
+#employeeLocked .card .trait{
+  font-size:clamp(21px,5.6vw,29px);
+  line-height:.88;
+  margin:0 0 8px;
+  color:#111!important
+}
+
+#employee .card .q,
+#employeeLocked .card .q{
+  font-size:clamp(14px,3.8vw,17px);
+  line-height:1.05;
+  font-weight:850;
+  color:#111!important;
+  max-width:none;
+  -webkit-line-clamp:4
+}
+
+#employee .card:before,
+#employeeLocked .card:before{display:none}
+
+#employee .actions,
+#employeeLocked .actions{gap:7px}
+
+#employee .action,
+#employeeLocked .action{
+  min-height:46px;
+  font-size:15px
+}
+
+@media (max-width:390px){
+  #employee .screen-title,
+  #employeeLocked .screen-title{font-size:27px}
+  #employee .job-banner,
+  #employeeLocked .job-banner{min-height:44px;font-size:14px;padding:7px 10px}
+  #employee .card,
+  #employeeLocked .card{padding:30px 10px 10px}
+  #employee .card .cat,
+  #employeeLocked .card .cat{font-size:8px;top:8px}
+  #employee .card .trait,
+  #employeeLocked .card .trait{font-size:clamp(19px,5.4vw,24px);margin-bottom:6px}
+  #employee .card .q,
+  #employeeLocked .card .q{font-size:clamp(12.5px,3.55vw,15px);line-height:1.04}
+}
+
+@media (max-height:700px) and (max-width:740px){
+  #employee .screen-title,
+  #employeeLocked .screen-title{font-size:24px}
+  #employee .job-banner,
+  #employeeLocked .job-banner{min-height:38px;font-size:12.5px;margin-bottom:5px}
+  #employee .cards,
+  #employeeLocked .cards{gap:5px;margin-bottom:5px}
+  #employee .card,
+  #employeeLocked .card{padding:27px 8px 8px}
+  #employee .card .cat,
+  #employeeLocked .card .cat{font-size:7px;top:7px;left:8px;right:8px}
+  #employee .card .trait,
+  #employeeLocked .card .trait{font-size:17px;margin-bottom:5px}
+  #employee .card .q,
+  #employeeLocked .card .q{font-size:11.5px;line-height:1.02;-webkit-line-clamp:4}
+  #employee .action,
+  #employeeLocked .action{min-height:38px;font-size:12px}
+}
+
+
+/* === STACKED QUALIFICATION CARDS === */
+#employee .cards,
+#employeeLocked .cards{
+  display:grid!important;
+  grid-template-columns:1fr!important;
+  grid-template-rows:repeat(4,minmax(0,1fr));
+  gap:8px!important;
+  height:calc(100dvh - 225px);
+  min-height:0;
+  margin:6px 0!important;
+}
+
+#employee .card,
+#employeeLocked .card{
+  min-height:0!important;
+  height:auto!important;
+  padding:10px 16px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  border-radius:18px!important;
+  overflow:hidden!important;
+}
+
+#employee .card .cat,
+#employeeLocked .card .cat,
+#employee .card .q,
+#employeeLocked .card .q,
+#employee .card:before,
+#employeeLocked .card:before{
+  display:none!important;
+}
+
+#employee .card .trait,
+#employeeLocked .card .trait{
+  margin:0!important;
+  color:#111!important;
+  font-size:clamp(26px,7.2vw,38px)!important;
+  line-height:.9!important;
+  letter-spacing:-.045em!important;
+  font-weight:1000!important;
+  text-transform:uppercase!important;
+  max-width:100%!important;
+}
+
+#employee .lock-badge,
+#employeeLocked .lock-badge{
+  right:10px!important;
+  top:50%!important;
+  transform:translateY(-50%)!important;
+}
+
+#employee .actions,
+#employeeLocked .actions{
+  margin-top:4px!important;
+  padding-top:4px!important;
+}
+
+#employee .action,
+#employeeLocked .action{
+  min-height:46px!important;
+}
+
+@media (max-width:390px){
+  #employee .cards,
+  #employeeLocked .cards{
+    height:calc(100dvh - 215px);
+    gap:6px!important;
+  }
+
+  #employee .card,
+  #employeeLocked .card{
+    padding:8px 13px!important;
+    border-radius:16px!important;
+  }
+
+  #employee .card .trait,
+  #employeeLocked .card .trait{
+    font-size:clamp(23px,6.8vw,32px)!important;
+  }
+}
+
+@media (max-height:720px) and (max-width:740px){
+  #employee .cards,
+  #employeeLocked .cards{
+    height:calc(100dvh - 190px);
+    gap:5px!important;
+  }
+
+  #employee .card .trait,
+  #employeeLocked .card .trait{
+    font-size:22px!important;
+  }
+
+  #employee .job-banner,
+  #employeeLocked .job-banner{
+    display:none!important;
+  }
+
+  #employee .screen-head,
+  #employeeLocked .screen-head{
+    margin-bottom:2px!important;
+  }
+}
+
+</style>
+</head>
+<body data-screen="menu">
+<div class="app"><div class="inner">
+<header class="topbar"><div class="lang-wrap"><button class="lang active" id="langEn" data-lang="en">✓ English</button><button class="lang" id="langEl" data-lang="el">Ελληνικά</button></div><div class="top-actions"><button class="sound-btn" id="soundBtn" aria-label="Toggle sound">🔊</button><button class="install-btn hidden" id="installBtn">Install app</button></div></header>
+<main>
+<section id="menu" class="screen active"><div class="hero-layout"><div class="panel hero"><div class="kicker" id="officeKicker"></div><h1 class="hero-title">Ανεργία<br>Core</h1><p class="tagline" id="tagline"></p><div class="sticker-row"><div class="sticker" id="mobileFirst"></div><div class="sticker alt" id="caseFile"></div><div class="sticker alt2" id="pending"></div></div><div class="install-hint" id="installHint"></div></div><div class="menu-side"><div class="section-label" id="chooseRole"></div><div class="role-grid"><button class="role selected" data-role="employee"><strong id="employeeRole"></strong><span class="desc" id="employeeDesc"></span><span class="emoji">🧑‍💼</span></button><button class="role" data-role="employer"><strong id="employerRole"></strong><span class="desc" id="employerDesc"></span><span class="emoji">🗂️</span></button></div><div class="menu-actions"><button class="big-btn primary" id="newGameBtn"></button><button class="big-btn secondary" id="continueBtn"></button><button class="qr-home-btn" id="qrHomeBtn"><span class="qr-icon">▦</span><span id="qrHomeLabel">Join with QR</span></button></div></div></div></section>
+<section id="pass" class="screen"><div class="panel pass-card"><div class="pass-inner"><div class="turn-badge" id="rolePill"></div><h2 class="turn-title" id="passTitle"></h2><p class="turn-sub" id="passSub"></p><button class="enter-btn" id="enterTurnBtn"></button></div></div></section>
+<section id="employee" class="screen"><div class="screen-head"><h2 class="screen-title" id="buildResume"></h2><div class="screen-note" id="applicationOpen"></div></div><div id="jobBanner"></div><div class="cards" id="cards"></div><div class="actions"><button class="action" id="newCardsBtn"></button><button class="action primary" id="doneBtn"></button></div></section>
+<section id="employeeLocked" class="screen"><div class="screen-head"><h2 class="screen-title" id="resumeLocked"></h2><div class="screen-note" id="approved"></div></div><div id="lockedJobBanner"></div><div class="cards" id="lockedCards"></div><div class="actions"><button class="action" id="menuBtn1"></button><button class="action primary" id="nextPlayerBtn"></button></div></section>
+<section id="employer" class="screen"><div class="screen-head"><h2 class="screen-title" id="pickJob"></h2><div class="screen-note" id="employerDesk"></div></div><div class="jobs-shell"><input class="search" id="jobSearch" type="search" autocomplete="off" /><div class="filter-row" id="jobFilters"></div><div class="jobs-topline"><div class="vacancy-count" id="vacancyCount"></div></div><div class="job-list" id="jobList"></div></div></section>
+<section id="employerLocked" class="screen"><div class="screen-head"><h2 class="screen-title" id="jobLocked"></h2><div class="screen-note" id="sealed"></div></div><div class="locked-panel"><div class="turn-badge" id="employerSelection"></div><div class="big" id="lockedJobName"></div><p class="note" id="jobLockedNote"></p></div><div class="actions"><button class="action" id="menuBtn2"></button><button class="action primary" id="nextEmployeeBtn"></button></div></section>
+</main><div class="footer" id="footer"></div></div></div>
+<div class="qr-modal" id="qrModal" role="dialog" aria-modal="true" aria-labelledby="qrTitle">
+  <div class="qr-sheet">
+    <h2 id="qrTitle">Join the game</h2>
+    <div class="qr-frame"><img id="qrImage" alt="QR code for this game" /></div>
+    <div class="qr-url" id="qrUrl"></div>
+    <div class="qr-actions">
+      <button id="qrCloseBtn">Close</button>
+      <button class="primary" id="qrCopyBtn">Copy link</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const QUALIFICATIONS=[{"en":{"category":"Ambition & Success","trait":"Famous","question":"Who is most likely to become famous?"},"el":{"category":"Φιλοδοξία & Επιτυχία","trait":"Διάσημος","question":"Ποιος είναι πιο πιθανό να γίνει διάσημος;"}},{"en":{"category":"Ambition & Success","trait":"Wealth","question":"Who is most likely to become a millionaire?"},"el":{"category":"Φιλοδοξία & Επιτυχία","trait":"Πλούτος","question":"Ποιος είναι πιο πιθανό να γίνει εκατομμυριούχος;"}},{"en":{"category":"Ambition & Success","trait":"Success","question":"Who is most likely to win the lottery?"},"el":{"category":"Φιλοδοξία & Επιτυχία","trait":"Επιτυχία","question":"Ποιος είναι πιο πιθανό να κερδίσει το λαχείο;"}},{"en":{"category":"Ambition & Success","trait":"Career","question":"Who is most likely to achieve their dream career?"},"el":{"category":"Φιλοδοξία & Επιτυχία","trait":"Καριέρα","question":"Ποιος είναι πιο πιθανό να πετύχει την καριέρα των ονείρων του;"}},{"en":{"category":"Ambition & Success","trait":"Power","question":"Who is most likely to become president?"},"el":{"category":"Φιλοδοξία & Επιτυχία","trait":"Εξουσία","question":"Ποιος είναι πιο πιθανό να γίνει πρόεδρος;"}},{"en":{"category":"Ambition & Success","trait":"Leadership","question":"Who is most likely to be the boss one day?"},"el":{"category":"Φιλοδοξία & Επιτυχία","trait":"Ηγεσία","question":"Ποιος είναι πιο πιθανό να γίνει το αφεντικό μια μέρα;"}},{"en":{"category":"Clumsiness & Forgetfulness","trait":"Clumsy","question":"Who is most likely to trip over nothing?"},"el":{"category":"Γκάφες & Ξεχασμάρα","trait":"Γκαφατζής","question":"Ποιος είναι πιο πιθανό να σκοντάψει στο τίποτα;"}},{"en":{"category":"Clumsiness & Forgetfulness","trait":"Forgetful","question":"Who is most likely to forget someone's name right after meeting them?"},"el":{"category":"Γκάφες & Ξεχασμάρα","trait":"Ξεχασιάρης","question":"Ποιος είναι πιο πιθανό να ξεχάσει το όνομα κάποιου αμέσως μόλις τον γνωρίσει;"}},{"en":{"category":"Clumsiness & Forgetfulness","trait":"Forgetful","question":"Who is most likely to forget their password?"},"el":{"category":"Γκάφες & Ξεχασμάρα","trait":"Ξεχασιάρης","question":"Ποιος είναι πιο πιθανό να ξεχάσει τον κωδικό του;"}},{"en":{"category":"Clumsiness & Forgetfulness","trait":"Forgetful","question":"Who is most likely to lock themselves out of their car?"},"el":{"category":"Γκάφες & Ξεχασμάρα","trait":"Ξεχασιάρης","question":"Ποιος είναι πιο πιθανό να κλειδωθεί έξω από το αυτοκίνητό του;"}},{"en":{"category":"Clumsiness & Forgetfulness","trait":"Directionally Challenged","question":"Who is most likely to get lost in their own neighborhood?"},"el":{"category":"Γκάφες & Ξεχασμάρα","trait":"Χάνει τον Προσανατολισμό","question":"Ποιος είναι πιο πιθανό να χαθεί στην ίδια του τη γειτονιά;"}},{"en":{"category":"Clumsiness & Forgetfulness","trait":"Clumsy","question":"Who is most likely to drop their phone in the toilet?"},"el":{"category":"Γκάφες & Ξεχασμάρα","trait":"Γκαφατζής","question":"Ποιος είναι πιο πιθανό να του πέσει το κινητό στην τουαλέτα;"}},{"en":{"category":"Habits & Quirks","trait":"Sleeping","question":"Who is most likely to sleep through an alarm?"},"el":{"category":"Συνήθειες & Κουσούρια","trait":"Ύπνος","question":"Ποιος είναι πιο πιθανό να μην ακούσει το ξυπνητήρι;"}},{"en":{"category":"Habits & Quirks","trait":"Eating","question":"Who is most likely to eat an entire pizza by themselves?"},"el":{"category":"Συνήθειες & Κουσούρια","trait":"Φαγητό","question":"Ποιος είναι πιο πιθανό να φάει μια ολόκληρη πίτσα μόνος του;"}},{"en":{"category":"Habits & Quirks","trait":"Sleeping","question":"Who is most likely to fall asleep during a movie?"},"el":{"category":"Συνήθειες & Κουσούρια","trait":"Ύπνος","question":"Ποιος είναι πιο πιθανό να αποκοιμηθεί στη μέση μιας ταινίας;"}},{"en":{"category":"Habits & Quirks","trait":"Technology","question":"Who is most likely to binge-watch an entire series in one day?"},"el":{"category":"Συνήθειες & Κουσούρια","trait":"Τεχνολογία","question":"Ποιος είναι πιο πιθανό να δει ολόκληρη σειρά σε μία μέρα;"}},{"en":{"category":"Habits & Quirks","trait":"Animals","question":"Who is most likely to adopt 10 cats?"},"el":{"category":"Συνήθειες & Κουσούρια","trait":"Ζώα","question":"Ποιος είναι πιο πιθανό να υιοθετήσει 10 γάτες;"}},{"en":{"category":"Habits & Quirks","trait":"Social","question":"Who is most likely to laugh at the wrong moment?"},"el":{"category":"Συνήθειες & Κουσούρια","trait":"Κοινωνικότητα","question":"Ποιος είναι πιο πιθανό να γελάσει στην πιο λάθος στιγμή;"}},{"en":{"category":"Emotional & Empathetic","trait":"Sensitive","question":"Who is most likely to cry during a movie?"},"el":{"category":"Συναίσθημα & Ενσυναίσθηση","trait":"Ευαίσθητος","question":"Ποιος είναι πιο πιθανό να κλάψει σε μια ταινία;"}},{"en":{"category":"Emotional & Empathetic","trait":"Supportive","question":"Who is most likely to give the best advice?"},"el":{"category":"Συναίσθημα & Ενσυναίσθηση","trait":"Υποστηρικτικός","question":"Ποιος είναι πιο πιθανό να δώσει την καλύτερη συμβουλή;"}},{"en":{"category":"Emotional & Empathetic","trait":"Caring","question":"Who is most likely to talk to animals?"},"el":{"category":"Συναίσθημα & Ενσυναίσθηση","trait":"Στοργικός","question":"Ποιος είναι πιο πιθανό να μιλάει στα ζώα;"}},{"en":{"category":"Emotional & Empathetic","trait":"Caring","question":"Who is most likely to volunteer for charity?"},"el":{"category":"Συναίσθημα & Ενσυναίσθηση","trait":"Στοργικός","question":"Ποιος είναι πιο πιθανό να γίνει εθελοντής σε φιλανθρωπία;"}},{"en":{"category":"Boldness & Spontaneity","trait":"Outgoing","question":"Who is most likely to dance in public?"},"el":{"category":"Τόλμη & Αυθορμητισμός","trait":"Εξωστρεφής","question":"Ποιος είναι πιο πιθανό να χορέψει δημόσια;"}},{"en":{"category":"Boldness & Spontaneity","trait":"Adventurous","question":"Who is most likely to travel the world?"},"el":{"category":"Τόλμη & Αυθορμητισμός","trait":"Περιπετειώδης","question":"Ποιος είναι πιο πιθανό να ταξιδέψει σε όλο τον κόσμο;"}},{"en":{"category":"Boldness & Spontaneity","trait":"Adventurous","question":"Who is most likely to go skydiving?"},"el":{"category":"Τόλμη & Αυθορμητισμός","trait":"Περιπετειώδης","question":"Ποιος είναι πιο πιθανό να κάνει skydiving;"}},{"en":{"category":"Boldness & Spontaneity","trait":"Impulsive","question":"Who is most likely to spend all their money on clothes?"},"el":{"category":"Τόλμη & Αυθορμητισμός","trait":"Παρορμητικός","question":"Ποιος είναι πιο πιθανό να ξοδέψει όλα του τα λεφτά σε ρούχα;"}},{"en":{"category":"Boldness & Spontaneity","trait":"Rebellious","question":"Who is most likely to talk their way out of a traffic ticket?"},"el":{"category":"Τόλμη & Αυθορμητισμός","trait":"Αντιδραστικός","question":"Ποιος είναι πιο πιθανό να ξεγλιστρήσει από κλήση της τροχαίας με τα λόγια;"}},{"en":{"category":"Talent & Creativity","trait":"Creative","question":"Who is most likely to write a bestselling book?"},"el":{"category":"Ταλέντο & Δημιουργικότητα","trait":"Δημιουργικός","question":"Ποιος είναι πιο πιθανό να γράψει ένα best seller;"}},{"en":{"category":"Talent & Creativity","trait":"Performance","question":"Who is most likely to become a famous actor?"},"el":{"category":"Ταλέντο & Δημιουργικότητα","trait":"Παραστατικός","question":"Ποιος είναι πιο πιθανό να γίνει διάσημος ηθοποιός;"}},{"en":{"category":"Talent & Creativity","trait":"Musical","question":"Who is most likely to become a famous singer?"},"el":{"category":"Ταλέντο & Δημιουργικότητα","trait":"Μουσικός","question":"Ποιος είναι πιο πιθανό να γίνει διάσημος τραγουδιστής;"}},{"en":{"category":"Talent & Creativity","trait":"Artistic","question":"Who is most likely to become an artist?"},"el":{"category":"Ταλέντο & Δημιουργικότητα","trait":"Καλλιτεχνικός","question":"Ποιος είναι πιο πιθανό να γίνει καλλιτέχνης;"}},{"en":{"category":"Social & Relationships","trait":"Romantic","question":"Who is most likely to marry their high school sweetheart?"},"el":{"category":"Κοινωνικά & Σχέσεις","trait":"Ρομαντικός","question":"Ποιος είναι πιο πιθανό να παντρευτεί τον σχολικό του έρωτα;"}},{"en":{"category":"Social & Relationships","trait":"Dramatic","question":"Who is most likely to have a big fight with a friend and then make up?"},"el":{"category":"Κοινωνικά & Σχέσεις","trait":"Δραματικός","question":"Ποιος είναι πιο πιθανό να κάνει τεράστιο καβγά με φίλο και μετά να τα ξαναβρούν;"}},{"en":{"category":"Social & Relationships","trait":"Secretive","question":"Who is most likely to keep a big secret from everyone?"},"el":{"category":"Κοινωνικά & Σχέσεις","trait":"Μυστικοπαθής","question":"Ποιος είναι πιο πιθανό να κρατήσει ένα μεγάλο μυστικό από όλους;"}},{"en":{"category":"Social & Relationships","trait":"Flirtatious","question":"Who is most likely to date two people at the same time?"},"el":{"category":"Κοινωνικά & Σχέσεις","trait":"Φλερτάκιας","question":"Ποιος είναι πιο πιθανό να βγαίνει με δύο άτομα ταυτόχρονα;"}},{"en":{"category":"Work & School","trait":"Academic","question":"Who is most likely to have the best grades in school?"},"el":{"category":"Δουλειά & Σχολείο","trait":"Ακαδημαϊκός","question":"Ποιος είναι πιο πιθανό να έχει τους καλύτερους βαθμούς στο σχολείο;"}},{"en":{"category":"Work & School","trait":"Lazy","question":"Who is most likely to sleep in class?"},"el":{"category":"Δουλειά & Σχολείο","trait":"Τεμπέλης","question":"Ποιος είναι πιο πιθανό να κοιμηθεί στην τάξη;"}},{"en":{"category":"Work & School","trait":"Ambitious","question":"Who is most likely to start a study group?"},"el":{"category":"Δουλειά & Σχολείο","trait":"Φιλόδοξος","question":"Ποιος είναι πιο πιθανό να οργανώσει ομάδα μελέτης;"}},{"en":{"category":"Work & School","trait":"Social","question":"Who is most likely to befriend the teacher?"},"el":{"category":"Δουλειά & Σχολείο","trait":"Κοινωνικός","question":"Ποιος είναι πιο πιθανό να γίνει φίλος με τον καθηγητή;"}},{"en":{"category":"Work & School","trait":"Rebellious","question":"Who is most likely to get caught passing notes?"},"el":{"category":"Δουλειά & Σχολείο","trait":"Αντιδραστικός","question":"Ποιος είναι πιο πιθανό να πιαστεί να περνάει σημειώματα;"}}];
+const JOBS=[{"en":{"category":"Action & Adventure","name":"Spy"},"el":{"category":"Δράση & Περιπέτεια","name":"Κατάσκοπος"}},{"en":{"category":"Action & Adventure","name":"Secret Agent"},"el":{"category":"Δράση & Περιπέτεια","name":"Μυστικός Πράκτορας"}},{"en":{"category":"Action & Adventure","name":"Bounty Hunter"},"el":{"category":"Δράση & Περιπέτεια","name":"Κυνηγός Επικηρυγμένων"}},{"en":{"category":"Action & Adventure","name":"Stunt Double"},"el":{"category":"Δράση & Περιπέτεια","name":"Κασκαντέρ"}},{"en":{"category":"Action & Adventure","name":"Astronaut"},"el":{"category":"Δράση & Περιπέτεια","name":"Αστροναύτης"}},{"en":{"category":"Action & Adventure","name":"Fighter Pilot"},"el":{"category":"Δράση & Περιπέτεια","name":"Πιλότος Μαχητικού"}},{"en":{"category":"Action & Adventure","name":"Helicopter Pilot"},"el":{"category":"Δράση & Περιπέτεια","name":"Πιλότος Ελικοπτέρου"}},{"en":{"category":"Action & Adventure","name":"Submarine Captain"},"el":{"category":"Δράση & Περιπέτεια","name":"Κυβερνήτης Υποβρυχίου"}},{"en":{"category":"Action & Adventure","name":"Paratrooper"},"el":{"category":"Δράση & Περιπέτεια","name":"Αλεξιπτωτιστής"}},{"en":{"category":"Action & Adventure","name":"Explosive Ordnance Disposal (EOD) Technician"},"el":{"category":"Δράση & Περιπέτεια","name":"Τεχνικός Εξουδετέρωσης Εκρηκτικών (EOD)"}},{"en":{"category":"Action & Adventure","name":"Ninja (Modern Day/Theatrical)"},"el":{"category":"Δράση & Περιπέτεια","name":"Νίντζα (Σύγχρονος/Θεατρικός)"}},{"en":{"category":"Action & Adventure","name":"Race Car Driver"},"el":{"category":"Δράση & Περιπέτεια","name":"Οδηγός Αγώνων"}},{"en":{"category":"Action & Adventure","name":"Test Pilot"},"el":{"category":"Δράση & Περιπέτεια","name":"Δοκιμαστής Πιλότος"}},{"en":{"category":"Action & Adventure","name":"Deep Sea Diver"},"el":{"category":"Δράση & Περιπέτεια","name":"Δύτης Μεγάλου Βάθους"}},{"en":{"category":"Action & Adventure","name":"Space Systems Engineer"},"el":{"category":"Δράση & Περιπέτεια","name":"Μηχανικός Διαστημικών Συστημάτων"}},{"en":{"category":"Creative & Arts","name":"Actor"},"el":{"category":"Δημιουργικά & Τέχνες","name":"Ηθοποιός"}},{"en":{"category":"Creative & Arts","name":"Porn Star"},"el":{"category":"Δημιουργικά & Τέχνες","name":"Πορνοστάρ"}},{"en":{"category":"Creative & Arts","name":"Film Director"},"el":{"category":"Δημιουργικά & Τέχνες","name":"Σκηνοθέτης"}},{"en":{"category":"Creative & Arts","name":"Rock Star"},"el":{"category":"Δημιουργικά & Τέχνες","name":"Ροκ Σταρ"}},{"en":{"category":"Creative & Arts","name":"Music Producer"},"el":{"category":"Δημιουργικά & Τέχνες","name":"Μουσικός Παραγωγός"}},{"en":{"category":"Creative & Arts","name":"Voice Actor"},"el":{"category":"Δημιουργικά & Τέχνες","name":"Ηθοποιός Φωνής"}},{"en":{"category":"Creative & Arts","name":"Special Effects Makeup Artist"},"el":{"category":"Δημιουργικά & Τέχνες","name":"Μακιγιέρ Ειδικών Εφέ"}},{"en":{"category":"Creative & Arts","name":"Tattoo Artist"},"el":{"category":"Δημιουργικά & Τέχνες","name":"Καλλιτέχνης Τατουάζ"}},{"en":{"category":"Creative & Arts","name":"Lego Sculptor"},"el":{"category":"Δημιουργικά & Τέχνες","name":"Γλύπτης LEGO"}},{"en":{"category":"Creative & Arts","name":"Ice Sculptor"},"el":{"category":"Δημιουργικά & Τέχνες","name":"Γλύπτης Πάγου"}},{"en":{"category":"Creative & Arts","name":"Concept Artist"},"el":{"category":"Δημιουργικά & Τέχνες","name":"Καλλιτέχνης Concept Art"}},{"en":{"category":"Creative & Arts","name":"Storyboard Artist"},"el":{"category":"Δημιουργικά & Τέχνες","name":"Καλλιτέχνης Storyboard"}},{"en":{"category":"Creative & Arts","name":"Video Game Designer"},"el":{"category":"Δημιουργικά & Τέχνες","name":"Σχεδιαστής Βιντεοπαιχνιδιών"}},{"en":{"category":"Creative & Arts","name":"Animator"},"el":{"category":"Δημιουργικά & Τέχνες","name":"Animator"}},{"en":{"category":"Creative & Arts","name":"Fashion Designer"},"el":{"category":"Δημιουργικά & Τέχνες","name":"Σχεδιαστής Μόδας"}},{"en":{"category":"Creative & Arts","name":"Costume Designer"},"el":{"category":"Δημιουργικά & Τέχνες","name":"Ενδυματολόγος"}},{"en":{"category":"Creative & Arts","name":"Comedian"},"el":{"category":"Δημιουργικά & Τέχνες","name":"Κωμικός"}},{"en":{"category":"Creative & Arts","name":"Magician"},"el":{"category":"Δημιουργικά & Τέχνες","name":"Ταχυδακτυλουργός"}},{"en":{"category":"Creative & Arts","name":"Illusionist"},"el":{"category":"Δημιουργικά & Τέχνες","name":"Ιλουζιονίστας"}},{"en":{"category":"Creative & Arts","name":"Sand Sculptor"},"el":{"category":"Δημιουργικά & Τέχνες","name":"Γλύπτης Άμμου"}},{"en":{"category":"Creative & Arts","name":"Children's Book Illustrator"},"el":{"category":"Δημιουργικά & Τέχνες","name":"Εικονογράφος Παιδικών Βιβλίων"}},{"en":{"category":"Creative & Arts","name":"Fortune Cookie Writer"},"el":{"category":"Δημιουργικά & Τέχνες","name":"Συγγραφέας Μηνυμάτων Fortune Cookie"}},{"en":{"category":"Food & Beverage","name":"Chocolate Consultant"},"el":{"category":"Φαγητό & Ποτό","name":"Σύμβουλος Σοκολάτας"}},{"en":{"category":"Food & Beverage","name":"Ice Cream Taster"},"el":{"category":"Φαγητό & Ποτό","name":"Δοκιμαστής Παγωτού"}},{"en":{"category":"Food & Beverage","name":"Beer Taster"},"el":{"category":"Φαγητό & Ποτό","name":"Δοκιμαστής Μπύρας"}},{"en":{"category":"Food & Beverage","name":"Brewmaster"},"el":{"category":"Φαγητό & Ποτό","name":"Αρχιζυθοποιός"}},{"en":{"category":"Food & Beverage","name":"Sommelier"},"el":{"category":"Φαγητό & Ποτό","name":"Σομελιέ"}},{"en":{"category":"Food & Beverage","name":"Food Stylist"},"el":{"category":"Φαγητό & Ποτό","name":"Food Stylist"}},{"en":{"category":"Food & Beverage","name":"Food Critic"},"el":{"category":"Φαγητό & Ποτό","name":"Κριτικός Γεύσης"}},{"en":{"category":"Food & Beverage","name":"Executive Chef"},"el":{"category":"Φαγητό & Ποτό","name":"Executive Chef"}},{"en":{"category":"Food & Beverage","name":"Pastry Chef"},"el":{"category":"Φαγητό & Ποτό","name":"Ζαχαροπλάστης"}},{"en":{"category":"Food & Beverage","name":"Mixologist"},"el":{"category":"Φαγητό & Ποτό","name":"Mixologist"}},{"en":{"category":"Food & Beverage","name":"Professional Competitive Eater"},"el":{"category":"Φαγητό & Ποτό","name":"Επαγγελματίας Διαγωνιζόμενος Φαγάς"}},{"en":{"category":"Travel & Leisure","name":"Private Island Caretaker"},"el":{"category":"Ταξίδια & Αναψυχή","name":"Φροντιστής Ιδιωτικού Νησιού"}},{"en":{"category":"Travel & Leisure","name":"Waterslide Tester"},"el":{"category":"Ταξίδια & Αναψυχή","name":"Δοκιμαστής Νεροτσουλήθρας"}},{"en":{"category":"Travel & Leisure","name":"Luxury Bed Tester (Professional Sleeper)"},"el":{"category":"Ταξίδια & Αναψυχή","name":"Δοκιμαστής Πολυτελών Κρεβατιών (Επαγγελματίας Υπναράς)"}},{"en":{"category":"Travel & Leisure","name":"Theme Park Ride Tester"},"el":{"category":"Ταξίδια & Αναψυχή","name":"Δοκιμαστής Παιχνιδιών Θεματικού Πάρκου"}},{"en":{"category":"Travel & Leisure","name":"Travel Vlogger/Influencer"},"el":{"category":"Ταξίδια & Αναψυχή","name":"Travel Vlogger / Influencer"}},{"en":{"category":"Travel & Leisure","name":"Scuba Diving Instructor"},"el":{"category":"Ταξίδια & Αναψυχή","name":"Εκπαιδευτής Καταδύσεων"}},{"en":{"category":"Travel & Leisure","name":"Skydiving Instructor"},"el":{"category":"Ταξίδια & Αναψυχή","name":"Εκπαιδευτής Ελεύθερης Πτώσης"}},{"en":{"category":"Travel & Leisure","name":"Outdoor Adventure Guide"},"el":{"category":"Ταξίδια & Αναψυχή","name":"Οδηγός Υπαίθριας Περιπέτειας"}},{"en":{"category":"Travel & Leisure","name":"Ski Instructor"},"el":{"category":"Ταξίδια & Αναψυχή","name":"Εκπαιδευτής Σκι"}},{"en":{"category":"Travel & Leisure","name":"Cruise Director"},"el":{"category":"Ταξίδια & Αναψυχή","name":"Υπεύθυνος Κρουαζιέρας"}},{"en":{"category":"Travel & Leisure","name":"Ghost Tour Guide"},"el":{"category":"Ταξίδια & Αναψυχή","name":"Ξεναγός Ghost Tour"}},{"en":{"category":"Animals & Nature","name":"Shark Tank Cleaner"},"el":{"category":"Ζώα & Φύση","name":"Καθαριστής Δεξαμενής Καρχαριών"}},{"en":{"category":"Animals & Nature","name":"Snake Milker"},"el":{"category":"Ζώα & Φύση","name":"Συλλέκτης Δηλητηρίου Φιδιών"}},{"en":{"category":"Animals & Nature","name":"Dolphin Trainer"},"el":{"category":"Ζώα & Φύση","name":"Εκπαιδευτής Δελφινιών"}},{"en":{"category":"Animals & Nature","name":"Wildlife Conservationist"},"el":{"category":"Ζώα & Φύση","name":"Ειδικός Προστασίας Άγριας Ζωής"}},{"en":{"category":"Animals & Nature","name":"Zookeeper"},"el":{"category":"Ζώα & Φύση","name":"Φροντιστής Ζωολογικού Κήπου"}},{"en":{"category":"Animals & Nature","name":"Pet Psychologist"},"el":{"category":"Ζώα & Φύση","name":"Ψυχολόγος Κατοικίδιων"}},{"en":{"category":"Animals & Nature","name":"Dog Surfing Instructor"},"el":{"category":"Ζώα & Φύση","name":"Εκπαιδευτής Surf για Σκύλους"}},{"en":{"category":"Animals & Nature","name":"Ravenmaster"},"el":{"category":"Ζώα & Φύση","name":"Ravenmaster / Φροντιστής Κορακιών"}},{"en":{"category":"Animals & Nature","name":"Volcanologist"},"el":{"category":"Ζώα & Φύση","name":"Ηφαιστειολόγος"}},{"en":{"category":"Animals & Nature","name":"Park Ranger"},"el":{"category":"Ζώα & Φύση","name":"Δασοφύλακας / Park Ranger"}},{"en":{"category":"Tech & Science","name":"Ethical Hacker (White Hat Hacker)"},"el":{"category":"Τεχνολογία & Επιστήμη","name":"Ηθικός Χάκερ (White Hat)"}},{"en":{"category":"Tech & Science","name":"Video Game Tester"},"el":{"category":"Τεχνολογία & Επιστήμη","name":"Δοκιμαστής Βιντεοπαιχνιδιών"}},{"en":{"category":"Tech & Science","name":"Robotics Engineer"},"el":{"category":"Τεχνολογία & Επιστήμη","name":"Μηχανικός Ρομποτικής"}},{"en":{"category":"Tech & Science","name":"Drone Pilot"},"el":{"category":"Τεχνολογία & Επιστήμη","name":"Χειριστής Drone"}},{"en":{"category":"Tech & Science","name":"Cybersecurity Expert"},"el":{"category":"Τεχνολογία & Επιστήμη","name":"Ειδικός Κυβερνοασφάλειας"}},{"en":{"category":"Tech & Science","name":"Forensic Investigator"},"el":{"category":"Τεχνολογία & Επιστήμη","name":"Εγκληματολογικός Ερευνητής"}},{"en":{"category":"Tech & Science","name":"Crime Scene Cleaner"},"el":{"category":"Τεχνολογία & Επιστήμη","name":"Καθαριστής Τόπου Εγκλήματος"}},{"en":{"category":"Tech & Science","name":"Paleontologist (Dinosaur Hunter)"},"el":{"category":"Τεχνολογία & Επιστήμη","name":"Παλαιοντολόγος (Κυνηγός Δεινοσαύρων)"}},{"en":{"category":"Tech & Science","name":"Marine Biologist"},"el":{"category":"Τεχνολογία & Επιστήμη","name":"Θαλάσσιος Βιολόγος"}},{"en":{"category":"Weird & Unusual","name":"Professional Line Stander"},"el":{"category":"Παράξενα & Ασυνήθιστα","name":"Επαγγελματίας Αναμονής σε Ουρές"}},{"en":{"category":"Weird & Unusual","name":"Professional Mourner (Cryer)"},"el":{"category":"Παράξενα & Ασυνήθιστα","name":"Επαγγελματίας Μοιρολογητής"}},{"en":{"category":"Weird & Unusual","name":"Professional Cuddler"},"el":{"category":"Παράξενα & Ασυνήθιστα","name":"Επαγγελματίας Αγκαλιαστής"}},{"en":{"category":"Weird & Unusual","name":"Train Pusher (Oshiya)"},"el":{"category":"Παράξενα & Ασυνήθιστα","name":"Σπρώχτης Τρένων (Oshiya)"}},{"en":{"category":"Weird & Unusual","name":"Odor Judge (Deodorant Tester)"},"el":{"category":"Παράξενα & Ασυνήθιστα","name":"Κριτής Οσμών (Δοκιμαστής Αποσμητικών)"}},{"en":{"category":"Weird & Unusual","name":"Golf Ball Diver"},"el":{"category":"Παράξενα & Ασυνήθιστα","name":"Δύτης για Μπαλάκια Γκολφ"}},{"en":{"category":"Weird & Unusual","name":"IMAX Screen Cleaner"},"el":{"category":"Παράξενα & Ασυνήθιστα","name":"Καθαριστής Οθονών IMAX"}},{"en":{"category":"Weird & Unusual","name":"Dog Food Tester"},"el":{"category":"Παράξενα & Ασυνήθιστα","name":"Δοκιμαστής Σκυλοτροφής"}},{"en":{"category":"Weird & Unusual","name":"Human Alarm Clock (Knocker-up - historical)"},"el":{"category":"Παράξενα & Ασυνήθιστα","name":"Ανθρώπινο Ξυπνητήρι (Knocker-up, ιστορικό)"}},{"en":{"category":"Weird & Unusual","name":"Paint Watcher"},"el":{"category":"Παράξενα & Ασυνήθιστα","name":"Παρατηρητής Μπογιάς"}},{"en":{"category":"Weird & Unusual","name":"Body Part Model"},"el":{"category":"Παράξενα & Ασυνήθιστα","name":"Μοντέλο Μέρους Σώματος"}},{"en":{"category":"Lifestyle & Glamour","name":"Masseur / Masseuse"},"el":{"category":"Lifestyle & Glamour","name":"Μασέρ"}},{"en":{"category":"Lifestyle & Glamour","name":"Personal Shopper"},"el":{"category":"Lifestyle & Glamour","name":"Personal Shopper"}},{"en":{"category":"Lifestyle & Glamour","name":"Celebrity Stylist"},"el":{"category":"Lifestyle & Glamour","name":"Στυλίστας Διασήμων"}},{"en":{"category":"Lifestyle & Glamour","name":"Billionaire's Wingman"},"el":{"category":"Lifestyle & Glamour","name":"Wingman Δισεκατομμυριούχου"}},{"en":{"category":"Lifestyle & Glamour","name":"Party Planner"},"el":{"category":"Lifestyle & Glamour","name":"Διοργανωτής Πάρτι"}},{"en":{"category":"Lifestyle & Glamour","name":"Luxury House Sitter"},"el":{"category":"Lifestyle & Glamour","name":"Φύλακας Πολυτελούς Σπιτιού"}},{"en":{"category":"Lifestyle & Glamour","name":"Event Coordinator (High-End)"},"el":{"category":"Lifestyle & Glamour","name":"Συντονιστής Luxury Events"}},{"en":{"category":"Law & Specialized","name":"Space Lawyer"},"el":{"category":"Νομικά & Εξειδικευμένα","name":"Δικηγόρος Διαστήματος"}},{"en":{"category":"Law & Specialized","name":"Private Investigator"},"el":{"category":"Νομικά & Εξειδικευμένα","name":"Ιδιωτικός Ερευνητής"}},{"en":{"category":"Law & Specialized","name":"FBI Profiler"},"el":{"category":"Νομικά & Εξειδικευμένα","name":"Profiler του FBI"}},{"en":{"category":"Law & Specialized","name":"Underwater Welder"},"el":{"category":"Νομικά & Εξειδικευμένα","name":"Υποβρύχιος Συγκολλητής"}},{"en":{"category":"Law & Specialized","name":"Airplane Repo-man"},"el":{"category":"Νομικά & Εξειδικευμένα","name":"Κατασχετής Αεροπλάνων"}}];
+const UI={"en":{"officeKicker":"APPLICATION OFFICE · UNEMPLOYMENT PROCESSING UNIT","tagline":"A fake unemployment-office party game for wonderfully questionable résumés.","mobileFirst":"📄 MOBILE-FIRST","caseFile":"CASE FILE 001","pending":"PENDING REVIEW","chooseRole":"Choose your role","employee":"Employee","employeeDesc":"Build your résumé from qualification cards.","employer":"Employer","employerDesc":"Choose the job everyone is fighting for.","newCase":"NEW<br>CASE","continueCase":"CONTINUE<br>CASE","employeeTurn":"Employee turn","employerTurn":"Employer turn","passNext":"Pass the phone to the next player","passEmployer":"Pass the phone to the employer","enterDesk":"ENTER<br>DESK","buildResume":"Build your résumé","employeeSub":"Four compact cards. Maximum questionable employability.","applicationOpen":"APPLICATION OPEN","newCards":"New cards","done":"Done","resumeLocked":"Résumé locked","lockedSub":"Filed and stamped. Suspiciously professional.","approved":"APPROVED","menu":"Menu","nextPlayer":"Next player","pickJob":"Pick the job","jobSub":"Choose one vacancy. It locks for this game.","employerDesk":"EMPLOYER DESK","searchJobs":"Search jobs…","allJobs":"All","vacancies":"vacancies","jobLocked":"Job locked","jobLockedSub":"This opening is fixed for the current case.","sealed":"SEALED","employerSelection":"Employer selection","jobLockedNote":"Employees can now build their gloriously questionable résumés for this job.","passEmployee":"Pass to employee","footer":"No login · No account · Game state stays on this device","jobToWin":"Job to win","noJob":"No employer job yet","buildBlind":"Play employer first, or build blind.","locked":"LOCKED","noJobs":"No jobs found.","alreadyLocked":"Job already locked","english":"✓ English","greek":"Ελληνικά","install":"Install app","installHelp":"Install from your browser menu for full-screen mode."},"el":{"officeKicker":"ΓΡΑΦΕΙΟ ΑΙΤΗΣΕΩΝ · ΤΜΗΜΑ ΕΠΕΞΕΡΓΑΣΙΑΣ ΑΝΕΡΓΙΑΣ","tagline":"Ένα ψεύτικο γραφείο ανεργίας για υπέροχα αμφίβολα βιογραφικά.","mobileFirst":"📄 MOBILE-FIRST","caseFile":"ΦΑΚΕΛΟΣ 001","pending":"ΣΕ ΑΝΑΜΟΝΗ","chooseRole":"Διάλεξε ρόλο","employee":"Υποψήφιος","employeeDesc":"Χτίσε το βιογραφικό σου από κάρτες προσόντων.","employer":"Εργοδότης","employerDesc":"Διάλεξε τη δουλειά για την οποία θα παλέψουν όλοι.","newCase":"ΝΕΟΣ<br>ΦΑΚΕΛΟΣ","continueCase":"ΣΥΝΕΧΕΙΑ<br>ΦΑΚΕΛΟΥ","employeeTurn":"Σειρά υποψηφίου","employerTurn":"Σειρά εργοδότη","passNext":"Δώσε το κινητό στον επόμενο παίκτη","passEmployer":"Δώσε το κινητό στον εργοδότη","enterDesk":"ΜΠΕΣ<br>ΣΤΟ ΓΚΙΣΕ","buildResume":"Χτίσε το βιογραφικό σου","employeeSub":"Τέσσερις compact κάρτες. Μέγιστη αμφίβολη απασχολησιμότητα.","applicationOpen":"ΑΙΤΗΣΗ ΑΝΟΙΧΤΗ","newCards":"Νέες κάρτες","done":"Τέλος","resumeLocked":"Βιογραφικό κλειδώθηκε","lockedSub":"Κατατέθηκε και σφραγίστηκε. Ύποπτα επαγγελματικό.","approved":"ΕΓΚΡΙΘΗΚΕ","menu":"Μενού","nextPlayer":"Επόμενος παίκτης","pickJob":"Διάλεξε δουλειά","jobSub":"Διάλεξε μία θέση. Κλειδώνει για αυτό το παιχνίδι.","employerDesk":"ΓΚΙΣΕ ΕΡΓΟΔΟΤΗ","searchJobs":"Αναζήτηση δουλειάς…","allJobs":"Όλες","vacancies":"θέσεις","jobLocked":"Η θέση κλειδώθηκε","jobLockedSub":"Η θέση είναι πλέον σταθερή για αυτόν τον φάκελο.","sealed":"ΣΦΡΑΓΙΣΤΗΚΕ","employerSelection":"Επιλογή εργοδότη","jobLockedNote":"Οι υποψήφιοι μπορούν τώρα να φτιάξουν τα ένδοξα αμφίβολα βιογραφικά τους για αυτή τη δουλειά.","passEmployee":"Δώσε στον υποψήφιο","footer":"Χωρίς login · Χωρίς λογαριασμό · Η πρόοδος μένει στη συσκευή","jobToWin":"Θέση προς διεκδίκηση","noJob":"Δεν έχει επιλεγεί δουλειά","buildBlind":"Παίξε πρώτα ως εργοδότης ή φτιάξε βιογραφικό στα τυφλά.","locked":"ΚΛΕΙΔΩΜΕΝΟ","noJobs":"Δεν βρέθηκαν δουλειές.","alreadyLocked":"Η δουλειά έχει ήδη κλειδώσει","english":"English","greek":"✓ Ελληνικά","install":"Εγκατάσταση app","installHelp":"Εγκατέστησέ το από το μενού του browser για full-screen λειτουργία."}};
+const COLORS={"Ambition & Success":"#b8922c","Clumsiness & Forgetfulness":"#d1544a","Habits & Quirks":"#d97f2f","Emotional & Empathetic":"#5f9f7d","Boldness & Spontaneity":"#8b73cd","Talent & Creativity":"#5f8fc9","Social & Relationships":"#c35b8e","Work & School":"#6e7886"};
+const JOB_COLORS={"Action & Adventure":"#d1544a","Creative & Arts":"#8b73cd","Food & Beverage":"#d97f2f","Travel & Leisure":"#5f8fc9","Animals & Nature":"#5f9f7d","Tech & Science":"#477f9d","Weird & Unusual":"#b8922c","Lifestyle & Glamour":"#c35b8e","Law & Specialized":"#66717c"};
+const QR_LABELS={en:{home:'Join with QR',title:'Join the game',close:'Close',copy:'Copy link',copied:'Link copied'},el:{home:'Μπες με QR',title:'Μπες στο παιχνίδι',close:'Κλείσιμο',copy:'Αντιγραφή link',copied:'Το link αντιγράφηκε'}};
+const state={role:'employee',cards:[],lockedCards:[],sound:true,job:null,lang:'en',category:'all'};
+const screens=[...document.querySelectorAll('.screen')];
+const $=id=>document.getElementById(id);
+let deferredInstallPrompt=null;
+const storageKey='anergia-core-state';
+function t(k){return UI[state.lang][k]||UI.en[k]||k;}
+function show(id){screens.forEach(s=>s.classList.toggle('active',s.id===id));document.body.dataset.screen=id;window.scrollTo({top:0,behavior:'smooth'});}
+function save(){localStorage.setItem(storageKey, JSON.stringify({role:state.role,cards:state.cards,lockedCards:state.lockedCards,job:state.job,lang:state.lang,category:state.category,sound:state.sound}));}
+function load(){try{const s=JSON.parse(localStorage.getItem(storageKey));if(s)Object.assign(state,s);}catch{}}
+function resetGame(){state.cards=[];state.lockedCards=[];state.job=null;state.category='all';save();}
+function beep(freq=420,dur=.045){if(!state.sound)return;try{const a=new (window.AudioContext||window.webkitAudioContext)(),o=a.createOscillator(),g=a.createGain();o.frequency.value=freq;g.gain.value=.025;o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+dur);}catch{}}
+function toast(txt){const el=$('toast');el.textContent=txt;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),1400);}
+function localQual(q){return q[state.lang]||q.en;}
+function localJob(j){return j[state.lang]||j.en;}
+function categories(){return [...new Set(JOBS.map(j=>j.en.category))];}
+function updatePassText(){$('rolePill').textContent=state.role==='employer'?t('employerTurn'):t('employeeTurn');$('passTitle').textContent=state.role==='employer'?t('passEmployer'):t('passNext');$('passSub').textContent=state.role==='employer'?t('jobSub'):t('employeeSub');}
+function renderCards(target,cards,locked){
+  $(target).innerHTML=cards.map(c=>{
+    const d=localQual(c);
+    return `<article class="card"><div class="trait">${d.trait}</div>${locked?`<div class="lock-badge">${t('locked')}</div>`:''}</article>`;
+  }).join('');
+}
+function renderJobBanner(target){
+  if(!$(target))return;
+  const label = state.lang==='el' ? 'ΔΟΥΛΕΙΑ' : 'JOB';
+  $(target).innerHTML = state.job
+    ? `<div class="job-banner"><div class="icon">💼</div><div>${label}: ${localJob(state.job).name}</div></div>`
+    : `<div class="job-banner"><div class="icon">⚠️</div><div>${t('noJob')}</div></div>`;
+}
+function renderFilters(){const cats=categories();$('jobFilters').innerHTML=`<button class="filter-chip ${state.category==='all'?'active':''}" data-cat="all">${t('allJobs')}</button>`+cats.map(c=>`<button class="filter-chip ${state.category===c?'active':''}" data-cat="${encodeURIComponent(c)}">${(JOBS.find(j=>j.en.category===c)[state.lang]||{category:c}).category}</button>`).join('');}
+function renderJobs(filter=''){const q=filter.trim().toLowerCase();const jobs=JOBS.filter(j=>{const a=j.en,b=j.el;const matchesQ=!q||a.name.toLowerCase().includes(q)||a.category.toLowerCase().includes(q)||b.name.toLowerCase().includes(q)||b.category.toLowerCase().includes(q);const matchesCat=state.category==='all'||a.category===state.category;return matchesQ&&matchesCat;});$('vacancyCount').textContent=`${jobs.length} ${t('vacancies')}`; $('jobList').innerHTML=jobs.map(j=>{const d=localJob(j), idx=JOBS.indexOf(j)+1, accent=JOB_COLORS[j.en.category]||'#ff8a3d';return `<button class="job" style="--jaccent:${accent}" data-job="${idx-1}"><div class="job-code">VACANCY ${String(idx).padStart(3,'0')}</div><div class="jcat">${d.category}</div><strong>${d.name}</strong></button>`;}).join('')||`<p class="note">${t('noJobs')}</p>`;}
+function applyLanguage(){document.documentElement.lang=state.lang;document.title='Ανεργία Core';$('officeKicker').textContent=t('officeKicker');$('tagline').textContent=t('tagline');$('mobileFirst').textContent=t('mobileFirst');$('caseFile').textContent=t('caseFile');$('pending').textContent=t('pending');$('chooseRole').textContent=t('chooseRole');$('employeeRole').textContent=t('employee');$('employerRole').textContent=t('employer');$('employeeDesc').textContent=t('employeeDesc');$('employerDesc').textContent=t('employerDesc');$('newGameBtn').innerHTML=t('newCase');$('continueBtn').innerHTML=t('continueCase');$('enterTurnBtn').innerHTML=t('enterDesk');$('buildResume').textContent=t('buildResume');$('applicationOpen').textContent=t('applicationOpen');$('newCardsBtn').textContent=t('newCards');$('doneBtn').textContent=t('done');$('resumeLocked').textContent=t('resumeLocked');$('approved').textContent=t('approved');$('menuBtn1').textContent=$('menuBtn2').textContent=t('menu');$('nextPlayerBtn').textContent=t('nextPlayer');$('pickJob').textContent=t('pickJob');$('employerDesk').textContent=t('employerDesk');$('jobSearch').placeholder=t('searchJobs');$('jobLocked').textContent=t('jobLocked');$('sealed').textContent=t('sealed');$('employerSelection').textContent=t('employerSelection');$('jobLockedNote').textContent=t('jobLockedNote');$('nextEmployeeBtn').textContent=t('passEmployee');$('footer').textContent=t('footer');$('langEn').textContent=t('english');$('langEl').textContent=t('greek');$('installBtn').textContent=t('install');$('installHint').textContent=t('installHelp');const ql=QR_LABELS[state.lang]||QR_LABELS.en;$('qrHomeLabel').textContent=ql.home;$('qrTitle').textContent=ql.title;$('qrCloseBtn').textContent=ql.close;$('qrCopyBtn').textContent=ql.copy;document.querySelectorAll('.lang').forEach(b=>b.classList.toggle('active',b.dataset.lang===state.lang));updatePassText();renderJobBanner('jobBanner');renderJobBanner('lockedJobBanner');if(state.cards.length)renderCards('cards',state.cards,false);if(state.lockedCards.length)renderCards('lockedCards',state.lockedCards,true);if(state.job)$('lockedJobName').textContent=localJob(state.job).name;renderFilters();renderJobs($('jobSearch').value||'');}
+function maybeShowInstall(){$('installBtn').classList.toggle('hidden', !deferredInstallPrompt);$('installHint').style.display = deferredInstallPrompt ? 'block' : 'none';}
+function pickCards(){const arr=[...QUALIFICATIONS];for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}state.cards=arr.slice(0,4);save();renderCards('cards',state.cards,false);}
+document.querySelectorAll('.role').forEach(b=>b.onclick=()=>{state.role=b.dataset.role;document.querySelectorAll('.role').forEach(x=>x.classList.toggle('selected',x===b));save();beep();});
+$('newGameBtn').onclick=()=>{resetGame();beep(520);updatePassText();show('pass');};
+$('continueBtn').onclick=()=>{load();applyLanguage();document.querySelectorAll('.role').forEach(x=>x.classList.toggle('selected',x.dataset.role===state.role));beep();updatePassText();show('pass');};
+$('enterTurnBtn').onclick=()=>{beep(620);if(state.role==='employer'){if(state.job){$('lockedJobName').textContent=localJob(state.job).name;show('employerLocked');}else{renderFilters();renderJobs();show('employer');}}else{if(!state.cards.length)pickCards();renderCards('cards',state.cards,false);renderJobBanner('jobBanner');show('employee');}};
+$('newCardsBtn').onclick=()=>{beep(480);pickCards();};
+$('doneBtn').onclick=()=>{state.lockedCards=[...state.cards];save();renderCards('lockedCards',state.lockedCards,true);renderJobBanner('lockedJobBanner');beep(720,.08);show('employeeLocked');};
+$('nextPlayerBtn').onclick=()=>{state.cards=[];save();state.role='employee';updatePassText();show('pass');};
+$('nextEmployeeBtn').onclick=()=>{state.role='employee';state.cards=[];save();updatePassText();show('pass');};
+$('menuBtn1').onclick=$('menuBtn2').onclick=()=>show('menu');
+$('jobSearch').oninput=e=>renderJobs(e.target.value);
+$('jobFilters').onclick=e=>{const b=e.target.closest('.filter-chip');if(!b)return;state.category=b.dataset.cat==='all'?'all':decodeURIComponent(b.dataset.cat);save();renderFilters();renderJobs($('jobSearch').value||'');};
+$('jobList').onclick=e=>{const btn=e.target.closest('.job');if(!btn)return;if(state.job){toast(t('alreadyLocked'));return;}state.job=JOBS[Number(btn.dataset.job)];save();$('lockedJobName').textContent=localJob(state.job).name;beep(760,.09);show('employerLocked');};
+$('soundBtn').onclick=()=>{state.sound=!state.sound;$('soundBtn').textContent=state.sound?'🔊':'🔇';save();if(state.sound)beep();};
+document.querySelectorAll('.lang').forEach(b=>b.onclick=()=>{state.lang=b.dataset.lang;save();applyLanguage();beep(350);});
+$('installBtn').onclick=async()=>{if(!deferredInstallPrompt){toast(t('installHelp'));return;}deferredInstallPrompt.prompt();const result=await deferredInstallPrompt.userChoice;deferredInstallPrompt=null;maybeShowInstall();if(result && result.outcome==='accepted')toast('Installed');};
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstallPrompt=e;maybeShowInstall();});
+window.addEventListener('appinstalled',()=>{deferredInstallPrompt=null;maybeShowInstall();});
+function currentGameUrl(){const u=new URL(window.location.href);u.hash='';return u.toString();}
+function openQr(){const url=currentGameUrl();$('qrUrl').textContent=url;$('qrImage').src='https://quickchart.io/qr?size=700&margin=2&text='+encodeURIComponent(url);$('qrModal').classList.add('open');document.body.style.overflow='hidden';}
+function closeQr(){$('qrModal').classList.remove('open');document.body.style.overflow='';}
+$('qrHomeBtn').onclick=()=>{beep(610,.05);openQr();};
+$('qrCloseBtn').onclick=closeQr;
+$('qrModal').onclick=e=>{if(e.target===$('qrModal'))closeQr();};
+$('qrCopyBtn').onclick=async()=>{const url=currentGameUrl();try{await navigator.clipboard.writeText(url);toast((QR_LABELS[state.lang]||QR_LABELS.en).copied);}catch{toast(url);}};
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeQr();});
+
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('/service-worker.js'));
+load();document.querySelectorAll('.role').forEach(x=>x.classList.toggle('selected',x.dataset.role===state.role));$('soundBtn').textContent=state.sound?'🔊':'🔇';applyLanguage();maybeShowInstall();
+</script></body></html>
